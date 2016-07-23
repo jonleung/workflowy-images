@@ -29,7 +29,7 @@ function do_parseImg() {
     }
 }
 
-function parseImg() {
+function generateImages() {
     $("div.notes div.content").live("click keyup", do_parseImg);
     $("div.notes div.content").each(do_parseImg);
     $("#expandButton").live("click", function() {
@@ -44,37 +44,11 @@ function parseImg() {
 
 };
 
-$(window).bind("load hashchange", parseImg);
-
-$(window).on("load", function(){console.log("load")});
-$(window).on("hashchange", function(){console.log("hashchange")});
-
+window.onhashchange = generateImages();
 $(document).keydown(function(e) {
     if(e.ctrlKey || e.metaKey) {
         setTimeout(function() {
-            parseImg();
-        }, 100);
+            generateImages();
+        }, 200);
     }
 });
-$(document).keyup(function(e) {
-    if(e.keyCode === 93 || e.keyCode === 91) { // the meta key apparently for key up?
-        setTimeout(function() {
-            parseImg();
-        }, 100);
-    }
-})
-
-/*
-Update the image when
-- the URL changes
-  - change nodes
-- on either keyup or keydown of cmd or ctrl
-  - paste
-*/
-
-window.onhashchange = function() {
-    console.log("hash changeed");
-    setTimeout(function() {
-        parseImg();
-    }, 0);
-}

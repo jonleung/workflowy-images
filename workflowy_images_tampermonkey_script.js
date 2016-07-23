@@ -11,44 +11,43 @@
 
 var IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".bmp"];
 
-function do_parseImg() {
-    $(this).nextAll(".content-img").remove();
-    var lines = $(this).text().split("\n");
-    var img_re = /^\!\[.*\]\((.+)\)$/;
+function parseAndGenerateImagesForContentNode(node) {
+  var $node = $(node);
+  $node.nextAll(".content-img").remove();
 
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        var extension = line.substr(-4);
-        var img = line.match(img_re);
-        if (img !== null) {
-            $(this).after('<div class="content-img"><img style="max-width: 100%;" src="' + img[1] + '"/></div>')
-        }
-        else if (_.contains(IMAGE_EXTENSIONS, extension)) {
-            $(this).after('<div class="content-img"><img style="max-width: 100%;" src="' + line + '"/></div>')
-        }
-    }
+  var text = $node.text();
+
+  var markdownImageRegex = /\!\[.*\]\((.+)\)/;
+  var matcher = text.match(markdownImageRegex);
+  if (matcher !== null) {
+    var imgSrc = matcher[1];
+    $node.after('<div class="content-img"><img style="max-width: 100%;" src="' + imgSrc + '"/></div>')
+  }
+}
+
+function parseAndGenerateImagesForLinkNode(node) {
+  var $node = $(node);
+  $node.nextAll(".content-img").remove();
+
+  var url = $node.text();
+  var curExtension = url.substr(-4);
+  if (_.contains(IMAGE_EXTENSIONS, curExtension) && $node.parent().text()[0] !== "!") {
+      $node.after('<div class="content-img"><img style="max-width: 100%;" src="' + url + '"/></div>')
+  }
 }
 
 function generateImages() {
-    $("div.notes div.content").live("click keyup", do_parseImg);
-    $("div.notes div.content").each(do_parseImg);
-    $("#expandButton").live("click", function() {
-        $("div.notes div.content").each(do_parseImg);
+    $("div.name a.contentLink").each(function(i, node) {
+        parseAndGenerateImagesForLinkNode(node);
+    })
+    $("div.name div.content, div.notes div.content").each(function(i, node) {
+      parseAndGenerateImagesForContentNode(node);
     });
-
-    $("div.name a.contentLink").live("click keyup", do_parseImg);
-    $("div.name a.contentLink").each(do_parseImg);
-    $("#expandButton").live("click", function() {
-        $("div.name a.contentLink").each(do_parseImg);
-    });
-
 };
 
-window.onhashchange = generateImages();
+window.onhashchange = generateImages;
 $(document).keydown(function(e) {
-    if(e.ctrlKey || e.metaKey) {
-        setTimeout(function() {
-            generateImages();
-        }, 200);
-    }
+    setTimeout(function() {
+        generateImages();
+    }, 250);
 });

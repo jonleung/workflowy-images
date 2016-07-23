@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         WorkflowyImages
+// @name         workflowy-images
 // @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  eetry to take over the world!
-// @author       You
+// @version      0.2
+// @description  Embed image links into workflowy
+// @author       Jonathan Leung (https://github.com/jonleung)
 // @match        https://workflowy.com/*
 // @grant        none
 // ==/UserScript==
@@ -11,7 +11,22 @@
 
 var IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".bmp"];
 
-function parseAndGenerateImagesForContentNode(node) {
+function createImageNodeAfterNode($node, imgSrc) {
+
+  var $div = $("<div>")
+                .addClass("content-img");
+  var $img = $("<img>")
+                .attr("src", imgSrc)
+                .css({
+                  "max-width": "100%",
+                  "max-height": "350px"
+                });
+  $div.append($img);
+
+  $node.after($div);
+}
+
+function generateImagesForContentNode(node) {
   var $node = $(node);
   $node.nextAll(".content-img").remove();
 
@@ -21,33 +36,45 @@ function parseAndGenerateImagesForContentNode(node) {
   var matcher = text.match(markdownImageRegex);
   if (matcher !== null) {
     var imgSrc = matcher[1];
-    $node.after('<div class="content-img"><img style="max-width: 100%;" src="' + imgSrc + '"/></div>')
+    createImageNodeAfterNode($node, imgSrc);
   }
 }
 
-function parseAndGenerateImagesForLinkNode(node) {
+function generateImagesForLinkNode(node) {
   var $node = $(node);
   $node.nextAll(".content-img").remove();
 
   var url = $node.text();
   var curExtension = url.substr(-4);
   if (_.contains(IMAGE_EXTENSIONS, curExtension) && $node.parent().text()[0] !== "!") {
-      $node.after('<div class="content-img"><img style="max-width: 100%;" src="' + url + '"/></div>')
+    createImageNodeAfterNode($node.parent(), url);
   }
 }
 
-function generateImages() {
-    $("div.name a.contentLink").each(function(i, node) {
-        parseAndGenerateImagesForLinkNode(node);
-    })
-    $("div.name div.content, div.notes div.content").each(function(i, node) {
-      parseAndGenerateImagesForContentNode(node);
-    });
+function checkForChanges() {
+  $("div.name div.content, div.notes div.content").each(function(i, node) {
+    generateImagesForContentNode(node);
+  });
+
+  $("div.name a.contentLink, div.notes a.contentLink").each(function(i, node) {
+    generateImagesForLinkNode(node);
+  });
+
+  // TODO: These currently need to be in this order because otherwise when
+  // there is a raw link  in the notes, it will be overwritten
 };
 
-window.onhashchange = generateImages;
+// When the page finishes loading
+$(window).load(function () {
+    checkForChanges();
+});
+
+// When you change nodes
+window.onhashchange = checkForChanges;
+
+// When you press any keyboard key
 $(document).keydown(function(e) {
-    setTimeout(function() {
-        generateImages();
-    }, 250);
+  setTimeout(function() {
+    checkForChanges();
+  }, 250);
 });

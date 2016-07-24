@@ -21,7 +21,6 @@
   function generateImagesForContentNode(node) {
     var $node = $(node);
 
-    debugger
     var text = $node.text();
 
     var markdownImageRegex = /\!\[.*\]\((.+)\)/;

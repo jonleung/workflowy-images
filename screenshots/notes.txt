@@ -1,0 +1,24 @@
+Paste an image url to embed it
+https://67.media.tumblr.com/avatar_4f34146efb15_128.png
+
+Pasting image urls in the notes field works too
+https://a.wattpad.com/useravatar/TeresaCakies.128.89197.jpg
+
+For images that DON'T end in .jpg .png and .gif, you can embed them like this
+![](http://bit.ly/2aD78gM)
+
+Or like this
+![](http://bit.ly/2aD78gM)
+
+Paste an image url to embed it
+
+--------------------------------------------------------------------------------
+
+Important Note:
+
+All image urls that end in .png, .jpg, .jpeg, .gif, and .bmp should work. Therefore, the following should work:
+
+https://67.media.tumblr.com/avatar_4f34146efb15_128.png
+https://a.wattpad.com/useravatar/TeresaCakies.128.89197.jpg
+
+For images that don't have the above file endings, like this: http://bit.ly/2aD78gM, you can embed it like so:

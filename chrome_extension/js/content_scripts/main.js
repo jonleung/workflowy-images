@@ -1,25 +1,27 @@
 (function() {
+
   var IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".bmp"];
 
   function createImageNodeAfterNode($node, imgSrc) {
+    if ($node.parent().find(".content-img").length === 0) {
+      var $div = $("<div>")
+                    .addClass("content-img");
+      var $img = $("<img>")
+                    .attr("src", imgSrc)
+                    .css({
+                      "max-width": "100%",
+                      "max-height": "350px"
+                    });
+      $div.append($img);
 
-    var $div = $("<div>")
-                  .addClass("content-img");
-    var $img = $("<img>")
-                  .attr("src", imgSrc)
-                  .css({
-                    "max-width": "100%",
-                    "max-height": "350px"
-                  });
-    $div.append($img);
-
-    $node.after($div);
+      $node.after($div);
+    }
   }
 
   function generateImagesForContentNode(node) {
     var $node = $(node);
-    $node.nextAll(".content-img").remove();
 
+    debugger
     var text = $node.text();
 
     var markdownImageRegex = /\!\[.*\]\((.+)\)/;
@@ -32,7 +34,6 @@
 
   function generateImagesForLinkNode(node) {
     var $node = $(node);
-    $node.nextAll(".content-img").remove();
 
     var url = $node.text();
     var curExtension = url.substr(-4);
